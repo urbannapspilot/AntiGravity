@@ -1,24 +1,24 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AdminApp from './AdminApp.jsx'
-import UserApp from './App.jsx'
+import App from './App.jsx' // Renamed from UserApp to App based on the instruction's code edit
+import { GlobalSessionProvider } from './context/GlobalSessionContext.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        {/* User App Routes */}
-        <Route path="/" element={<UserApp />} />
-        <Route path="/scan" element={<UserApp />} />
+    <GlobalSessionProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* User Application Routes */}
+          <Route path="/" element={<App />} />
+          <Route path="/scan" element={<App />} />
 
-        {/* Admin Dashboard */}
-        <Route path="/admin" element={<AdminApp />} />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Admin Application Route */}
+          <Route path="/admin/*" element={<AdminApp />} />
+        </Routes>
+      </BrowserRouter>
+    </GlobalSessionProvider>
   </React.StrictMode>,
 )

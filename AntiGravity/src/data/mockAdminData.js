@@ -90,7 +90,8 @@ export const initialPods = [
         name: "Alpha Unit",
         overrides: {
             requiresEmailLogin: null,
-            isPaid: null
+            isPaid: null,
+            allowAdvanceBooking: true
         },
         napOptions: [
             { durationMinutes: 30, price: 15 },
@@ -105,7 +106,8 @@ export const initialPods = [
         name: "Lobby Station A",
         overrides: {
             requiresEmailLogin: null,
-            isPaid: false
+            isPaid: false,
+            allowAdvanceBooking: false
         },
         napOptions: [
             { durationMinutes: 20, price: 10 },
@@ -121,7 +123,8 @@ export const initialPods = [
         name: "Quiet Room 1",
         overrides: {
             requiresEmailLogin: null,
-            isPaid: null
+            isPaid: null,
+            allowAdvanceBooking: true
         },
         napOptions: [
             { durationMinutes: 15, price: 0 },
@@ -136,11 +139,44 @@ export const initialPods = [
         name: "Lounge Rear Bay",
         overrides: {
             requiresEmailLogin: null,
-            isPaid: null
+            isPaid: null,
+            allowAdvanceBooking: true
         },
         napOptions: [
             { durationMinutes: 45, price: 0 },
             { durationMinutes: 120, price: 0 },
         ]
+    }
+];
+
+// Promotions and Discounts
+export const initialPromotions = [
+    {
+        id: "promo-1",
+        clientId: "client-1", // Urban Naps Central
+        code: "STARTUP50",
+        discountType: "percentage", // 'percentage' or 'fixed'
+        discountValue: 50, // 50%
+        active: true,
+        maxUses: 1000,
+        currentUses: 142,
+        minimumSpend: 0,
+        startDate: "2023-01-01",
+        endDate: "2029-12-31",
+        description: "Universal startup 50% discount to drive adoption."
+    },
+    {
+        id: "promo-2",
+        clientId: "client-2", // Acme Wellness
+        code: "WINTERFREE",
+        discountType: "fixed", // $ off
+        discountValue: 15, // $15 off
+        active: true,
+        maxUses: 50,
+        currentUses: 50, // Reached max
+        minimumSpend: 10,
+        startDate: "2024-11-01",
+        endDate: "2025-03-01",
+        description: "Acme corporate holiday perk. Fully consumed."
     }
 ];
