@@ -13,7 +13,8 @@ export const LandingView = ({
     handlePodSelect,
     handleLogin,
     email,
-    setEmail
+    setEmail,
+    setSearchParams
 }) => {
     if (currentStep === 1) {
         if (activeLocation && activeClient) {
@@ -104,13 +105,13 @@ export const LandingView = ({
                     <p className="text-xs text-slate-500 font-mono text-left mb-2 uppercase tracking-widest">Simulator Shortcuts (Admin Test):</p>
                     <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                         {initialLocations.map(loc => (
-                            <button key={loc.id} onClick={() => window.location.href = `/?locationId=${loc.id}`} className="w-full text-left px-3 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-slate-300 transition-colors">
+                            <button key={loc.id} onClick={() => setSearchParams({ locationId: loc.id })} className="w-full text-left px-3 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-slate-300 transition-colors">
                                 <MapPin className="w-3 h-3 inline-block mr-1.5 opacity-60" />
                                 {loc.name} <span className="text-slate-500">({loc.id})</span>
                             </button>
                         ))}
                         {initialPods.map(pod => (
-                            <button key={pod.id} onClick={() => window.location.href = `/?podId=${pod.id}`} className="w-full text-left px-3 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-slate-300 transition-colors">
+                            <button key={pod.id} onClick={() => setSearchParams({ podId: pod.id })} className="w-full text-left px-3 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-slate-300 transition-colors">
                                 <Play className="w-3 h-3 inline-block mr-1.5 opacity-60" />
                                 {pod.name} <span className="text-slate-500">({pod.id})</span>
                             </button>

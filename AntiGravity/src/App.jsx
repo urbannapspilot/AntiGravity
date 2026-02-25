@@ -20,7 +20,7 @@ const resolveThemeProps = (client) => {
 };
 
 export default function App() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // Derived state from URL parameters
     const scanLocId = searchParams.get('locationId');
@@ -113,7 +113,7 @@ export default function App() {
         // If we came from a direct pod scan, we shouldn't go back to the location list.
         // For prototype purposes, we'll reset the URL if they end the session.
         if (scanPodId) {
-            window.location.href = '/';
+            setSearchParams({});
         }
     };
 
@@ -308,6 +308,7 @@ export default function App() {
                                     handleLogin={handleLogin}
                                     email={email}
                                     setEmail={setEmail}
+                                    setSearchParams={setSearchParams}
                                 />
                             )}
                             {['3a', '3b', 3, 4].includes(currentStep) && (
