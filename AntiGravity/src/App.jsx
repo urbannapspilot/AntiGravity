@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Coffee, Clock, ShieldAlert, Wifi, Battery, MapPin, CheckCircle, Lock, Calendar, ArrowRight, UserCircle, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { initialClients, initialPods, initialLocations, initialPromotions } from './data/mockAdminData';
 import { useGlobalSession } from './context/GlobalSessionContext';
 import { UserHeader } from './components/user/layout/UserHeader';
@@ -21,6 +21,7 @@ const resolveThemeProps = (client) => {
 
 export default function App() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     // Derived state from URL parameters
     const scanLocId = searchParams.get('locationId');
@@ -111,9 +112,9 @@ export default function App() {
         setScheduledTime('');
 
         // If we came from a direct pod scan, we shouldn't go back to the location list.
-        // For prototype purposes, we'll reset the URL if they end the session.
-        if (scanPodId) {
-            setSearchParams({});
+        // Cleanly wipe the hash routing state for SPAs.
+        if (scanPodId || scanLocId) {
+            navigate('/', { replace: true });
         }
     };
 
