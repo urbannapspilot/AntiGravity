@@ -167,7 +167,8 @@ export const initialPromotions = [
         minimumSpend: 0,
         startDate: "2023-01-01",
         endDate: "2029-12-31",
-        description: "Universal startup 50% discount to drive adoption."
+        description: "Universal startup 50% discount to drive adoption.",
+        generatedCodes: []
     },
     {
         id: "promo-2",
@@ -181,6 +182,7 @@ export const initialPromotions = [
         minimumSpend: 10,
         startDate: "2024-11-01",
         endDate: "2025-03-01",
-        description: "Acme corporate holiday perk. Fully consumed."
+        description: "Acme corporate holiday perk. Fully consumed.",
+        generatedCodes: []
     }
 ];

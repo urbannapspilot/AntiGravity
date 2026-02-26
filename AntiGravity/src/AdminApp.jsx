@@ -188,7 +188,8 @@ export default function AdminApp() {
             minimumSpend: Number(newPromoFlow.minimumSpend || 0),
             startDate: newPromoFlow.startDate || new Date().toISOString().split('T')[0],
             endDate: newPromoFlow.endDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-            description: ""
+            description: "",
+            generatedCodes: []
         };
         setPromotions(prev => [...prev, newPromo]);
         setShowAddForm(false);
