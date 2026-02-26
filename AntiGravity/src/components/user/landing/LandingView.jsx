@@ -1,5 +1,5 @@
-import React from 'react';
-import { Play, Battery, Wifi, MapPin, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Battery, Wifi, MapPin, Calendar, AlertCircle } from 'lucide-react';
 
 export const LandingView = ({
     currentStep,
@@ -16,6 +16,25 @@ export const LandingView = ({
     setEmail,
     setSearchParams
 }) => {
+    const [loginError, setLoginError] = useState('');
+
+    const interceptLogin = (e) => {
+        e.preventDefault();
+        setLoginError('');
+
+        // Domain Validation Logic
+        if (activeClient?.whitelistedDomains && activeClient.whitelistedDomains.length > 0) {
+            const domain = email.trim().toLowerCase().split('@')[1];
+            if (!domain || !activeClient.whitelistedDomains.includes(domain)) {
+                setLoginError(`Access is restricted to authorized domains only.`);
+                return; // Stop the flow
+            }
+        }
+
+        // Passed validation, continue to next step handled by App.jsx
+        handleLogin(e);
+    };
+
     if (currentStep === 1) {
         if (activeLocation && activeClient) {
             // Show units specifically at this location
@@ -136,7 +155,7 @@ export const LandingView = ({
                         <p className="text-slate-500 text-sm leading-relaxed">Please verify your email to access the complimentary amenities provided by your host.</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-4">
+                    <form onSubmit={interceptLogin} className="space-y-4">
                         <div>
                             <input
                                 type="email"
@@ -144,9 +163,20 @@ export const LandingView = ({
                                 placeholder="Enter your email"
                                 className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                                 value={email}
-                                onChange={e => setEmail(e.target.value)}
+                                onChange={e => {
+                                    setEmail(e.target.value);
+                                    if (loginError) setLoginError('');
+                                }}
                             />
                         </div>
+
+                        {loginError && (
+                            <div className="flex items-start gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 text-sm font-medium">
+                                <AlertCircle className="w-5 h-5 shrink-0" />
+                                <p>{loginError}</p>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
                             className="w-full py-4 rounded-xl text-white font-semibold text-lg hover:opacity-90 active:scale-[0.98] transition-all"

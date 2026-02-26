@@ -9,6 +9,7 @@ export const initialClients = [
         customTheme: null,
         defaultRequiresEmailLogin: false,
         defaultIsPaid: true,
+        whitelistedDomains: [],
         permissions: {
             canEditBranding: false,
             canOverrideLoginRules: true,
@@ -22,6 +23,7 @@ export const initialClients = [
         customTheme: "#4F46E5",
         defaultRequiresEmailLogin: true,
         defaultIsPaid: true,
+        whitelistedDomains: ["acme.com", "acmewellness.com"],
         permissions: {
             canEditBranding: true,
             canOverrideLoginRules: false,
@@ -35,6 +37,7 @@ export const initialClients = [
         customTheme: "#10B981",
         defaultRequiresEmailLogin: false,
         defaultIsPaid: false,
+        whitelistedDomains: ["wework.com"],
         permissions: {
             canEditBranding: true,
             canOverrideLoginRules: true,
@@ -48,6 +51,7 @@ export const initialClients = [
         customTheme: null,
         defaultRequiresEmailLogin: true,
         defaultIsPaid: false,
+        whitelistedDomains: [],
         permissions: {
             canEditBranding: false,
             canOverrideLoginRules: false,

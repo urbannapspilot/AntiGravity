@@ -34,6 +34,7 @@ export default function AdminApp() {
     // View state
     // "dashboard", "clients", "locations", "pods", "branding", "qr-gen"
     const [currentView, setCurrentView] = useState("dashboard");
+    const [selectedClient, setSelectedClient] = useState(null);
     const [editingPod, setEditingPod] = useState(null);
     const [podDetailsTab, setPodDetailsTab] = useState('overview'); // "overview", "future", "history", "config"
     const [selectedPromotion, setSelectedPromotion] = useState(null);
@@ -63,6 +64,16 @@ export default function AdminApp() {
                         [permissionKey]: !c.permissions[permissionKey]
                     }
                 };
+            }
+            return c;
+        }));
+    };
+
+    const updateClientWhitelist = (clientId, newDomains) => {
+        if (!isSuperAdmin) return;
+        setClients(prev => prev.map(c => {
+            if (c.id === clientId) {
+                return { ...c, whitelistedDomains: newDomains };
             }
             return c;
         }));
@@ -129,6 +140,7 @@ export default function AdminApp() {
             customTheme: newClientFlow.type === "custom" ? "#3b82f6" : null,
             defaultRequiresEmailLogin: false,
             defaultIsPaid: true,
+            whitelistedDomains: [],
             permissions: { canEditBranding: true, canOverrideLoginRules: false, canDefineNapPricing: true }
         };
         setClients(prev => [...prev, newClient]);
@@ -243,7 +255,13 @@ export default function AdminApp() {
                         newClientFlow={newClientFlow}
                         setNewClientFlow={setNewClientFlow}
                         toggleClientPermission={toggleClientPermission}
+                        updateClientWhitelist={updateClientWhitelist}
                         renderEmptyState={renderEmptyState}
+                        selectedClient={selectedClient}
+                        setSelectedClient={setSelectedClient}
+                        pods={pods}
+                        locations={locations}
+                        pastSessions={pastSessions}
                     />
                 )}
                 {currentView === 'locations' && (
