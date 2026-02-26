@@ -161,12 +161,49 @@ export default function App() {
         setPromoError('');
         if (!promoInput.trim()) return;
 
-        // Find a matching active promo for this specific client or a universal one
-        const promo = initialPromotions.find(p =>
-            p.active &&
-            p.code === promoInput.toUpperCase() &&
-            p.clientId === activeClient?.id
-        );
+        const rawInput = promoInput.toUpperCase();
+        let promo = null;
+        let isUniqueCode = false;
+        let uniqueCodeObject = null;
+
+        // Try to find a Promo where the root code matches exactly
+        const exactPromo = initialPromotions.find(p => p.active && p.code === rawInput && p.clientId === activeClient?.id);
+
+        if (exactPromo) {
+            // Strict check: if redemptionStrategy says unique_restricted, we cannot accept the root code
+            if (exactPromo.redemptionStrategy === 'unique_restricted') {
+                setPromoError('This base code is disabled. A unique coupon code is required.');
+                return;
+            }
+            promo = exactPromo;
+        } else {
+            // If root doesn't match, let's explore all promos to see if it's a generated unique code
+            for (const p of initialPromotions) {
+                if (p.active && p.clientId === activeClient?.id && p.generatedCodes) {
+                    const matchedCode = p.generatedCodes.find(gc => gc.code === rawInput);
+                    if (matchedCode) {
+                        promo = p;
+                        isUniqueCode = true;
+                        uniqueCodeObject = matchedCode;
+                        break;
+                    }
+                }
+            }
+
+            if (promo) {
+                // We found a child code. Ensure the parent promo allows unique codes.
+                if (promo.redemptionStrategy === 'global') {
+                    setPromoError('This campaign does not support uniquely generated codes.');
+                    return;
+                }
+
+                // Ensure the unique code hasn't been redeemed already
+                if (uniqueCodeObject.status !== 'unused') {
+                    setPromoError('This unique code has already been redeemed.');
+                    return;
+                }
+            }
+        }
 
         if (!promo) {
             setPromoError('Invalid or expired promo code.');
@@ -198,6 +235,10 @@ export default function App() {
             return;
         }
 
+        // If applying a unique code, we attach its specific code string back to the state
+        // so we can display it nicely in the UI cart, but 'promo' is still the parent object holding the rules.
+        const appliedPromoObj = isUniqueCode ? { ...promo, appliedCodeName: uniqueCodeObject.code } : { ...promo, appliedCodeName: promo.code };
+
         // Calculate new price
         let newPrice = selectedNap.originalPrice;
         if (promo.discountType === 'percentage') {
@@ -206,7 +247,7 @@ export default function App() {
             newPrice = Math.max(0, newPrice - promo.discountValue);
         }
 
-        setAppliedPromo(promo);
+        setAppliedPromo(appliedPromoObj);
         setSelectedNap(prev => ({ ...prev, effectivePrice: newPrice }));
     };
 

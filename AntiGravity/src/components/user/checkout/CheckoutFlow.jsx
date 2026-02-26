@@ -191,7 +191,7 @@ export const CheckoutFlow = ({
 
                             {appliedPromo && (
                                 <div className="flex justify-between items-center mb-3 text-emerald-600">
-                                    <span className="font-medium text-sm">Promo: {appliedPromo.code}</span>
+                                    <span className="font-medium text-sm">Promo: {appliedPromo.appliedCodeName || appliedPromo.code}</span>
                                     <span className="font-semibold text-sm">
                                         -{appliedPromo.discountType === 'percentage' ? `${appliedPromo.discountValue}%` : `$${appliedPromo.discountValue}`}
                                     </span>

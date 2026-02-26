@@ -168,7 +168,10 @@ export const initialPromotions = [
         startDate: "2023-01-01",
         endDate: "2029-12-31",
         description: "Universal startup 50% discount to drive adoption.",
-        generatedCodes: []
+        redemptionStrategy: "hybrid",
+        generatedCodes: [
+            { code: "STARTUP50-TESTCODE", status: "unused", usedAt: null, usedBy: null }
+        ]
     },
     {
         id: "promo-2",
@@ -183,6 +186,7 @@ export const initialPromotions = [
         startDate: "2024-11-01",
         endDate: "2025-03-01",
         description: "Acme corporate holiday perk. Fully consumed.",
+        redemptionStrategy: "global",
         generatedCodes: []
     }
 ];

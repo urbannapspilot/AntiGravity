@@ -189,14 +189,15 @@ export default function AdminApp() {
             startDate: newPromoFlow.startDate || new Date().toISOString().split('T')[0],
             endDate: newPromoFlow.endDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
             description: "",
+            redemptionStrategy: newPromoFlow.redemptionStrategy || "global",
             generatedCodes: []
         };
         setPromotions(prev => [...prev, newPromo]);
         setShowAddForm(false);
-        setNewPromoFlow({ code: "", clientId: "", discountType: "percentage", discountValue: 10, maxUses: 100, minimumSpend: 0, startDate: new Date().toISOString().split('T')[0], endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0] });
+        setNewPromoFlow({ code: "", clientId: "", discountType: "percentage", discountValue: 10, maxUses: 100, minimumSpend: 0, startDate: new Date().toISOString().split('T')[0], endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], redemptionStrategy: "global" });
     };
 
-    const [newPromoFlow, setNewPromoFlow] = useState({ code: "", clientId: "", discountType: "percentage", discountValue: 10, maxUses: 100, minimumSpend: 0, startDate: new Date().toISOString().split('T')[0], endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0] });
+    const [newPromoFlow, setNewPromoFlow] = useState({ code: "", clientId: "", discountType: "percentage", discountValue: 10, maxUses: 100, minimumSpend: 0, startDate: new Date().toISOString().split('T')[0], endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], redemptionStrategy: "global" });
 
     const renderEmptyState = (message, actionText, actionFn) => (
         <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
