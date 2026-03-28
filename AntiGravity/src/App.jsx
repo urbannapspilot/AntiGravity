@@ -62,10 +62,10 @@ export default function App() {
         const fetchData = async () => {
             try {
                 const [podsRes, locsRes, orgsRes, promosRes] = await Promise.all([
-                    fetch('http://localhost:3001/api/admin/pods').then(r => r.json()),
-                    fetch('http://localhost:3001/api/admin/locations').then(r => r.json()),
-                    fetch('http://localhost:3001/api/admin/organizations').then(r => r.json()),
-                    fetch('http://localhost:3001/api/admin/promotions').then(r => r.json())
+                    fetch(`${API_BASE_URL}/api/admin/pods`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/api/admin/locations`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/api/admin/organizations`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/api/admin/promotions`).then(r => r.json())
                 ]);
 
                 setInitialPods(podsRes.data || []);

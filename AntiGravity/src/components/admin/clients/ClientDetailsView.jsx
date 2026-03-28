@@ -18,7 +18,7 @@ export const ClientDetailsView = ({
     // Fetch real booking history for this client on mount
     useEffect(() => {
         setHistoryLoading(true);
-        fetch(`http://localhost:3001/api/admin/sessions/client/${client.id}`)
+        fetch(`${API_BASE_URL}/api/admin/sessions/client/${client.id}`)
             .then(r => r.json())
             .then(data => {
                 if (data?.status?.success) {

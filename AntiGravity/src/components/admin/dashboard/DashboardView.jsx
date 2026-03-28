@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, MapPin, Clock, Users, Timer } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { API_BASE_URL } from '../../../config';
 
 export const DashboardView = ({ isSuperAdmin, visiblePods, visibleLocations, clients }) => {
     const [dashboardData, setDashboardData] = useState({
@@ -9,7 +10,7 @@ export const DashboardView = ({ isSuperAdmin, visiblePods, visibleLocations, cli
     });
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/admin/dashboard')
+        fetch(`${API_BASE_URL}/api/admin/dashboard`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data) {

@@ -14,6 +14,7 @@ import { PodsBrowser } from './components/admin/pods/PodsBrowser';
 import { PodEditor } from './components/admin/pods/PodEditor';
 import { PromotionsHub } from './components/admin/promotions/PromotionsHub';
 import { AdminSidebar } from './components/admin/layout/AdminSidebar';
+import { API_BASE_URL } from './config';
 
 // Shared: QR Code Generator component extracted to src/components/shared/QrGenView.jsx
 
@@ -27,7 +28,7 @@ export default function AdminApp() {
     // --- Backend Fetching ---
     useEffect(() => {
         // Power the admin frontend from the newly created admin-core backend!
-        fetch('http://localhost:3001/api/admin/organizations')
+        fetch(`${API_BASE_URL}/api/admin/organizations`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data && data.data.length > 0) {
@@ -36,7 +37,7 @@ export default function AdminApp() {
             })
             .catch(err => console.warn("Using mock clients (admin-core backend not reachable running on 3001)"));
 
-        fetch('http://localhost:3001/api/admin/pods')
+        fetch(`${API_BASE_URL}/api/admin/pods`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data && data.data.length > 0) {
@@ -45,7 +46,7 @@ export default function AdminApp() {
             })
             .catch(err => console.warn("Using mock pods (admin-core backend not reachable)"));
 
-        fetch('http://localhost:3001/api/admin/locations')
+        fetch(`${API_BASE_URL}/api/admin/locations`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data) {
@@ -54,7 +55,7 @@ export default function AdminApp() {
             })
             .catch(err => console.warn("Using mock locations fallback", err));
 
-        fetch('http://localhost:3001/api/admin/promotions')
+        fetch(`${API_BASE_URL}/api/admin/promotions`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data) {
@@ -164,7 +165,7 @@ export default function AdminApp() {
     const handleAddClient = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/admin/organizations', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/organizations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: newClientFlow.name }) // backend uses title
@@ -172,7 +173,7 @@ export default function AdminApp() {
             const data = await res.json();
             if (data?.status?.success) {
                 // Refresh list
-                const clientsRes = await fetch('http://localhost:3001/api/admin/organizations').then(r => r.json());
+                const clientsRes = await fetch(`${API_BASE_URL}/api/admin/organizations`).then(r => r.json());
                 setClients(clientsRes.data);
                 setShowAddForm(false);
                 setNewClientFlow({ name: "", type: "custom" });
@@ -185,14 +186,14 @@ export default function AdminApp() {
     const handleAddLocation = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/admin/locations', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/locations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newLocationFlow.name, organization_id: newLocationFlow.clientId })
             });
             const data = await res.json();
             if (data?.status?.success) {
-                const locsRes = await fetch('http://localhost:3001/api/admin/locations').then(r => r.json());
+                const locsRes = await fetch(`${API_BASE_URL}/api/admin/locations`).then(r => r.json());
                 setLocations(locsRes.data);
                 setShowAddForm(false);
                 setNewLocationFlow({ name: "", clientId: "" });
@@ -205,7 +206,7 @@ export default function AdminApp() {
     const handleAddPod = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/admin/pods', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/pods`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -232,7 +233,7 @@ export default function AdminApp() {
     const handleAddPromo = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/admin/promotions', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/promotions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -249,7 +250,7 @@ export default function AdminApp() {
             });
             const data = await res.json();
             if (data?.status?.success) {
-                const promosRes = await fetch('http://localhost:3001/api/admin/promotions').then(r => r.json());
+                const promosRes = await fetch(`${API_BASE_URL}/api/admin/promotions`).then(r => r.json());
                 setPromotions(promosRes.data);
                 setShowAddForm(false);
                 setNewPromoFlow({ code: "", clientId: "", discountType: "percentage", discountValue: 10, maxUses: 100, minimumSpend: 0, startDate: new Date().toISOString().split('T')[0], endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], redemptionStrategy: "global" });
@@ -261,7 +262,7 @@ export default function AdminApp() {
 
     const updateClientWhitelist = async (clientId, newDomains) => {
         try {
-            const res = await fetch(`http://localhost:3001/api/admin/organizations/${clientId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/admin/organizations/${clientId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ whitelistedDomains: newDomains })

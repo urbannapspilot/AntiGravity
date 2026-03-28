@@ -25,7 +25,7 @@ export const GlobalSessionProvider = ({ children }) => {
     // Setup BroadcastChannel for cross-tab communication
     useEffect(() => {
         // Fetch initial data from backend
-        fetch('http://localhost:3001/api/admin/sessions')
+        fetch(`${API_BASE_URL}/api/admin/sessions`)
             .then(res => res.json())
             .then(data => {
                 if (data?.status?.success && data.data) {
