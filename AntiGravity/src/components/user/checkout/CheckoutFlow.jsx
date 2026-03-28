@@ -221,6 +221,29 @@ export const CheckoutFlow = ({
         // Mocking some unvailable times (every 3rd slot disabled)
         const isTimeAvailable = (idx) => idx % 3 !== 1;
 
+        // Helper to check if a slot is within the selected range
+        const isSlotInRange = (timeString) => {
+            if (!scheduledTime) return false;
+            try {
+                const parseTime = (s) => {
+                    const [t, p] = s.split(' ');
+                    const [h, m] = t.split(':').map(Number);
+                    return (p.toLowerCase() === 'pm' && h !== 12 ? h + 12 : (p.toLowerCase() === 'am' && h === 12 ? 0 : h)) * 60 + m;
+                };
+                const startMins = parseTime(scheduledTime);
+                const currentMins = parseTime(timeString);
+                const duration = selectedNap?.durationMinutes || 30;
+                
+                // Handle wraparound for long bookings (e.g. 11pm + 4 hours)
+                if (currentMins < startMins) {
+                    return currentMins + 1440 >= startMins && currentMins + 1440 < startMins + duration;
+                }
+                return currentMins >= startMins && currentMins < startMins + duration;
+            } catch (e) {
+                return false;
+            }
+        };
+
         const onConfirm = () => {
             if (!scheduledTime) {
                 // If nothing selected, just select the first available for UX sake.
@@ -351,14 +374,17 @@ export const CheckoutFlow = ({
                                          <span className="text-[10px] font-medium text-slate-600 px-1 absolute -top-4 left-0">{t}</span>
                                          <button 
                                             onClick={() => setScheduledTime(t)}
-                                            className="h-10 w-full rounded border-t border-b border-r border-slate-100 first:border-l relative hover:bg-slate-50 transition-colors"
+                                            className={`h-10 w-full rounded border-t border-b border-r border-slate-100 first:border-l relative hover:bg-slate-50 transition-colors ${isSlotInRange(t) ? 'bg-primary/5' : ''}`}
+                                            style={isSlotInRange(t) ? { backgroundColor: `${theme.color}10`, borderColor: theme.color } : {}}
                                          >
-                                            {isSelected && (
-                                                <div className="absolute inset-y-0 -left-px -right-px border-2 border-slate-900 rounded pointer-events-none flex items-center justify-center">
-                                                    <div className="absolute -top-6 min-w-max bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow z-10">
-                                                        {t}
-                                                    </div>
-                                                    <div className="w-0.5 h-full bg-slate-900 absolute left-0"></div>
+                                            {isSlotInRange(t) && (
+                                                <div className="absolute inset-y-0 -left-px -right-px border-2 border-slate-900 rounded pointer-events-none flex items-center justify-center" style={{ borderColor: theme.color }}>
+                                                    {scheduledTime === t && (
+                                                        <div className="absolute -top-6 min-w-max bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow z-10" style={{ backgroundColor: theme.color }}>
+                                                            {t}
+                                                        </div>
+                                                    )}
+                                                    <div className="w-0.5 h-full bg-slate-900 absolute left-0" style={{ backgroundColor: theme.color }}></div>
                                                 </div>
                                             )}
                                          </button>
@@ -420,9 +446,30 @@ export const CheckoutFlow = ({
                             
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-slate-600 font-medium flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-slate-400" /> Time
+                                    <Clock className="w-4 h-4 text-slate-400" /> Slot
                                 </span>
-                                <span className="font-semibold text-slate-900">{scheduledTime}</span>
+                                <span className="font-semibold text-slate-900">
+                                    {(() => {
+                                        // Simple logic to calculate end time for display
+                                        try {
+                                            const [time, period] = scheduledTime.split(' ');
+                                            const [hours, minutes] = time.split(':').map(Number);
+                                            let totalMinutes = (period.toLowerCase() === 'pm' && hours !== 12 ? hours + 12 : (period.toLowerCase() === 'am' && hours === 12 ? 0 : hours)) * 60 + minutes;
+                                            totalMinutes += selectedNap?.durationMinutes || 30;
+                                            
+                                            const endHours24 = Math.floor(totalMinutes / 60) % 24;
+                                            const endMinutes = totalMinutes % 60;
+                                            const endPeriod = endHours24 >= 12 ? 'pm' : 'am';
+                                            const endHours12 = endHours24 % 12 || 12;
+
+                                            const isNextDay = totalMinutes >= 1440;
+                                            
+                                            return `${scheduledTime} - ${endHours12}:${endMinutes.toString().padStart(2, '0')} ${endPeriod}${isNextDay ? ' (+1 day)' : ''}`;
+                                        } catch (e) {
+                                            return scheduledTime;
+                                        }
+                                    })()}
+                                </span>
                             </div>
 
                             <div className="flex justify-between items-center mb-2">

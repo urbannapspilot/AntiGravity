@@ -100,6 +100,10 @@ export const initialPods = [
         napOptions: [
             { durationMinutes: 30, price: 15 },
             { durationMinutes: 60, price: 25 },
+            { durationMinutes: 120, price: 45 },
+            { durationMinutes: 240, price: 80 },
+            { durationMinutes: 480, price: 150 },
+            { durationMinutes: 720, price: 200 },
         ]
     },
     {
@@ -133,6 +137,11 @@ export const initialPods = [
         napOptions: [
             { durationMinutes: 15, price: 0 },
             { durationMinutes: 30, price: 0 },
+            { durationMinutes: 60, price: 0 },
+            { durationMinutes: 120, price: 0 },
+            { durationMinutes: 240, price: 0 },
+            { durationMinutes: 480, price: 0 },
+            { durationMinutes: 720, price: 0 },
         ]
     },
     {

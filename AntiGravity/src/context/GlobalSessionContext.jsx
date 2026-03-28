@@ -24,6 +24,18 @@ export const GlobalSessionProvider = ({ children }) => {
 
     // Setup BroadcastChannel for cross-tab communication
     useEffect(() => {
+        // Fetch initial data from backend
+        fetch('http://localhost:3001/api/admin/sessions')
+            .then(res => res.json())
+            .then(data => {
+                if (data?.status?.success && data.data) {
+                    setActiveSessions(data.data.activeSessions || []);
+                    setUpcomingBookings(data.data.upcomingBookings || []);
+                    setPastSessions(data.data.pastSessions || []);
+                }
+            })
+            .catch(err => console.warn("Using default session state", err));
+
         const channel = new BroadcastChannel('urban_naps_session_sync');
 
         channel.onmessage = (event) => {

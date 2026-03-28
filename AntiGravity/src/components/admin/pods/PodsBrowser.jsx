@@ -47,6 +47,14 @@ export const PodsBrowser = ({
                         />
                     </div>
                     <div>
+                        <label className="block text-xs font-medium text-slate-500 mb-1 text-indigo-600 font-bold">IoT Thing Name (Must match AWS)</label>
+                        <input
+                            required type="text" placeholder="e.g. pod_alpha_01"
+                            value={newPodFlow.thingName} onChange={e => setNewPodFlow({ ...newPodFlow, thingName: e.target.value })}
+                            className="w-full px-3 py-2 border border-indigo-200 bg-indigo-50/30 rounded-lg outline-none focus:border-indigo-500 text-sm font-mono"
+                        />
+                    </div>
+                    <div>
                         <label className="block text-xs font-medium text-slate-500 mb-1">Hardware Type</label>
                         <select
                             value={newPodFlow.type} onChange={e => setNewPodFlow({ ...newPodFlow, type: e.target.value })}

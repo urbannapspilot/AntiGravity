@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Clock, ShieldAlert, XCircle, Calendar, Settings, CheckCircle, Download } from 'lucide-react';
-import { downloadCsv } from '../../../utils/csvExport';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Clock, ShieldAlert, XCircle, Calendar, Settings, CheckCircle } from 'lucide-react';
+import { BookingHistoryTable } from '../shared/BookingHistoryTable';
 
 export const PodEditor = ({
     pod,
@@ -20,14 +20,38 @@ export const PodEditor = ({
 }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [podHistory, setPodHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+
+    // Fetch real booking history for this specific pod on mount
+    useEffect(() => {
+        if (!pod?.id) return;
+        setHistoryLoading(true);
+        // Fetch by clientId and filter by podId
+        const clientId = pod.clientId;
+        const url = clientId
+            ? `http://localhost:3001/api/admin/sessions/client/${clientId}`
+            : `http://localhost:3001/api/admin/sessions/pod/${pod.id}`;
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if (data?.status?.success) {
+                    // Filter to only this pod's sessions
+                    const podSessions = (data.data || []).filter(s => s.podId === pod.id);
+                    setPodHistory(podSessions);
+                }
+            })
+            .catch(err => console.warn('Could not load pod history', err))
+            .finally(() => setHistoryLoading(false));
+    }, [pod.id, pod.clientId]);
 
     // Resolve permissions based on persona
     const canEditPricing = isSuperAdmin || currentClient?.permissions.canDefineNapPricing;
     const canOverrideLogin = isSuperAdmin || currentClient?.permissions.canOverrideLoginRules;
 
-    const activeSession = activeSessions.find(s => s.podId === pod.id);
-    const podFutureBookings = upcomingBookings.filter(b => b.podId === pod.id);
-    const podPastSessions = pastSessions.filter(s => s.podId === pod.id);
+    const activeSession = (activeSessions || []).find(s => s.podId === pod.id);
+    const podFutureBookings = (upcomingBookings || []).filter(b => b.podId === pod.id);
+    const podPastSessions = podHistory; // Use locally fetched real data
 
     // Filter sessions based on date range
     const filteredSessions = podPastSessions.filter(session => {
@@ -47,22 +71,6 @@ export const PodEditor = ({
 
     const totalSessions = filteredSessions.length;
     const totalMinutes = filteredSessions.reduce((sum, s) => sum + s.durationMinutes, 0);
-
-    const handleExportCsv = () => {
-        const columns = [
-            { header: 'Session ID', key: 'id' },
-            { header: 'Date', key: row => new Date(row.startTime || row.terminatedAt).toLocaleDateString() },
-            { header: 'Time', key: row => new Date(row.startTime || row.terminatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
-            { header: 'User Email', key: 'email' },
-            { header: 'Pod ID', key: 'podId' },
-            { header: 'Duration (Min)', key: 'durationMinutes' },
-            { header: 'Price ($)', key: 'price' },
-            { header: 'Status', key: 'status' }
-        ];
-
-        const filename = `${pod.name.replace(/\s+/g, '_').toLowerCase()}_sessions_${new Date().toISOString().split('T')[0]}`;
-        downloadCsv(filteredSessions, columns, filename);
-    };
 
     return (
         <div className="p-8 lg:p-12 animate-fade-in max-w-5xl">
@@ -178,90 +186,12 @@ export const PodEditor = ({
 
                     {/* Tab Content: Session History */}
                     {podDetailsTab === 'history' && (
-                        <div className="space-y-6 animate-fade-in-up">
-                            {/* Analytics & Filters Header */}
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <div className="flex gap-4">
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Total Sessions</p>
-                                        <p className="text-2xl font-black text-slate-800 leading-none">{totalSessions}</p>
-                                    </div>
-                                    <div className="w-px bg-slate-200"></div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Total Duration</p>
-                                        <p className="text-2xl font-black text-indigo-600 leading-none">{totalMinutes} <span className="text-sm font-semibold text-indigo-400">min</span></p>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
-                                        <span className="text-xs font-medium text-slate-500">From:</span>
-                                        <input
-                                            type="date"
-                                            value={startDate}
-                                            onChange={e => setStartDate(e.target.value)}
-                                            className="bg-transparent text-sm font-medium text-slate-700 outline-none"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
-                                        <span className="text-xs font-medium text-slate-500">To:</span>
-                                        <input
-                                            type="date"
-                                            value={endDate}
-                                            onChange={e => setEndDate(e.target.value)}
-                                            className="bg-transparent text-sm font-medium text-slate-700 outline-none"
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={handleExportCsv}
-                                        disabled={filteredSessions.length === 0}
-                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 font-semibold text-sm rounded-xl hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-auto md:ml-0"
-                                    >
-                                        <Download className="w-4 h-4" /> Export CSV
-                                    </button>
-                                </div>
-                            </div>
-
-                            {filteredSessions.length === 0 ? (
-                                <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <Clock className="w-8 h-8 mx-auto text-slate-300 mb-3" />
-                                    <p>No session data available for the selected dates.</p>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto bg-white border border-slate-200 rounded-2xl shadow-sm">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="border-b-2 border-slate-100 bg-slate-50">
-                                                <th className="py-3 px-4 font-bold text-xs uppercase tracking-widest text-slate-400">Date & Time</th>
-                                                <th className="py-3 px-4 font-bold text-xs uppercase tracking-widest text-slate-400">User</th>
-                                                <th className="py-3 px-4 font-bold text-xs uppercase tracking-widest text-slate-400">Duration</th>
-                                                <th className="py-3 px-4 font-bold text-xs uppercase tracking-widest text-slate-400">Result</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
-                                            {filteredSessions.sort((a, b) => new Date(b.terminatedAt) - new Date(a.terminatedAt)).map(session => {
-                                                const terminatedAt = new Date(session.terminatedAt);
-                                                const isForceEnded = session.status === 'force-ended';
-                                                return (
-                                                    <tr key={session.id} className="hover:bg-slate-50/50 transition-colors">
-                                                        <td className="py-4 px-4">
-                                                            <p className="font-medium text-slate-900">{terminatedAt.toLocaleDateString()}</p>
-                                                            <p className="text-xs text-slate-500">{terminatedAt.toLocaleTimeString()}</p>
-                                                        </td>
-                                                        <td className="py-4 px-4 text-sm font-medium text-slate-700">{session.email || 'Guest'}</td>
-                                                        <td className="py-4 px-4 text-sm text-slate-500">{session.durationMinutes} mins</td>
-                                                        <td className="py-4 px-4">
-                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${isForceEnded ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                                                                {isForceEnded ? 'Force Ended' : 'Completed'}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
+                        <div className="animate-fade-in-up">
+                            <BookingHistoryTable
+                                sessions={podHistory}
+                                loading={historyLoading}
+                                exportPrefix={pod.name.replace(/\s+/g, '_').toLowerCase()}
+                            />
                         </div>
                     )}
 

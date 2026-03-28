@@ -23,7 +23,7 @@ export const PromotionsHub = ({
         const promo = promotions.find(p => p.id === promoId);
         if (!promo) return null;
 
-        const usagePercentage = promo.maxUses > 0 ? Math.min(100, (promo.currentUses / promo.maxUses) * 100) : 0;
+        const usagePercentage = promo.maxUses > 0 ? Math.min(100, ((promo.currentUses || 0) / promo.maxUses) * 100) : 0;
 
         const updatePromo = (field, value) => {
             setPromotions(prev => prev.map(p => p.id === promo.id ? { ...p, [field]: value } : p));
@@ -74,7 +74,7 @@ export const PromotionsHub = ({
                         <p className="text-base text-slate-500 font-medium tracking-tight">
                             {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `$${promo.discountValue} OFF`}
                             <span className="mx-2 text-slate-300">•</span>
-                            {activePersona === 'super-admin' ? (clients.find(c => c.id === promo.clientId)?.name || 'Unknown Client') : 'My Promotion'}
+                            {activePersona === 'super-admin' ? ((clients || []).find(c => c?.id === promo?.clientId)?.name || 'Unknown Client') : 'My Promotion'}
                         </p>
                     </div>
                 </div>
@@ -254,8 +254,8 @@ export const PromotionsHub = ({
     if (selectedPromotion) return renderPromotionDetailsView(selectedPromotion);
 
     const visiblePromotions = activePersona === 'super-admin'
-        ? promotions
-        : promotions.filter(p => p.clientId === activePersona);
+        ? (promotions || [])
+        : (promotions || []).filter(p => p?.clientId === activePersona);
 
     return (
         <div className="p-8 lg:p-12 animate-fade-in max-w-6xl">

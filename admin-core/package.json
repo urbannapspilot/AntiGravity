@@ -1,0 +1,25 @@
+{
+  "name": "admin-core",
+  "version": "1.0.0",
+  "description": "AntiGravity Admin Backend",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.5.0",
+    "@UrbanNaps/urbannaps-orm": "file:../urbannaps-orm",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.26.2",
+    "mysql2": "^3.20.0",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

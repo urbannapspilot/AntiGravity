@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Coffee, Clock, ShieldAlert, Wifi, Battery, MapPin, CheckCircle, Lock, Calendar, ArrowRight, UserCircle, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { initialClients, initialPods, initialLocations, initialPromotions } from './data/mockAdminData';
 import { useGlobalSession } from './context/GlobalSessionContext';
 import { UserHeader } from './components/user/layout/UserHeader';
 import { LandingView } from './components/user/landing/LandingView';
@@ -50,13 +49,41 @@ export default function App() {
     const [scheduledDate, setScheduledDate] = useState(new Date().toISOString().split('T')[0]);
     const [scheduledTime, setScheduledTime] = useState('');
 
-    // Promo Data
-    const [promoInput, setPromoInput] = useState('');
     const [appliedPromo, setAppliedPromo] = useState(null);
     const [promoError, setPromoError] = useState('');
+    const [initialPods, setInitialPods] = useState([]);
+    const [initialLocations, setInitialLocations] = useState([]);
+    const [initialClients, setInitialClients] = useState([]);
+    const [initialPromotions, setInitialPromotions] = useState([]);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    // Initial Data Fetch
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [podsRes, locsRes, orgsRes, promosRes] = await Promise.all([
+                    fetch('http://localhost:3001/api/admin/pods').then(r => r.json()),
+                    fetch('http://localhost:3001/api/admin/locations').then(r => r.json()),
+                    fetch('http://localhost:3001/api/admin/organizations').then(r => r.json()),
+                    fetch('http://localhost:3001/api/admin/promotions').then(r => r.json())
+                ]);
+
+                setInitialPods(podsRes.data || []);
+                setInitialLocations(locsRes.data || []);
+                setInitialClients(orgsRes.data || []);
+                setInitialPromotions(promosRes.data || []);
+                setIsDataLoaded(true);
+            } catch (e) {
+                console.error("Critical: Failed to sync with Core API", e);
+            }
+        };
+        fetchData();
+    }, []);
 
     // Initial Routing Logic
     useEffect(() => {
+        if (!isDataLoaded) return;
+        
         if (scanPodId) {
             // Direct Pod Scan
             const pod = initialPods.find(p => p.id === scanPodId);
@@ -84,7 +111,7 @@ export default function App() {
                 setCurrentStep(1); // Stay on step 1 to show the list
             }
         }
-    }, [scanLocId, scanPodId]);
+    }, [isDataLoaded, scanLocId, scanPodId, initialPods, initialLocations, initialClients]);
 
     // Global Timer Sync Effect
     useEffect(() => {
@@ -351,6 +378,17 @@ export default function App() {
     // ActiveSessionView handles Step 5
     // ConfirmationView handles Step 6
     // UserProfileOverlay handles Profile View
+
+    if (!isDataLoaded) {
+        return (
+            <div className="h-screen w-full bg-slate-100 flex items-center justify-center font-sans">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-slate-500 font-medium">Syncing with Urban Naps Core...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-screen w-full bg-slate-100 flex items-center justify-center font-sans sm:p-4">
