@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, X, Box, MapPin, Clock, Tag } from 'lucide-react';
 import { BookingHistoryTable } from '../shared/BookingHistoryTable';
+import { API_BASE_URL } from '../../../config';
 
 export const ClientDetailsView = ({
     client,

@@ -30,8 +30,8 @@ export const PodEditor = ({
         // Fetch by clientId and filter by podId
         const clientId = pod.clientId;
         const url = clientId
-            ? `http://localhost:3001/api/admin/sessions/client/${clientId}`
-            : `http://localhost:3001/api/admin/sessions/pod/${pod.id}`;
+            ? `${API_BASE_URL}/api/admin/sessions/client/${clientId}`
+            : `${API_BASE_URL}/api/admin/sessions/pod/${pod.id}`;
         fetch(url)
             .then(r => r.json())
             .then(data => {
