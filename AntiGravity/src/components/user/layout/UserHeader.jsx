@@ -13,8 +13,8 @@ export const UserHeader = ({ currentStep, showProfile, setShowProfile }) => {
                 </div>
             </div>
 
-            {/* Header Overlay Layer (always on top of views except Step 1 and 6) */}
-            {currentStep > 1 && currentStep < 6 && (
+            {/* Header Overlay Layer (always on top of views except Step 6) */}
+            {currentStep !== 6 && (
                 <div className="absolute top-12 right-6 z-50">
                     <button
                         onClick={() => setShowProfile(!showProfile)}

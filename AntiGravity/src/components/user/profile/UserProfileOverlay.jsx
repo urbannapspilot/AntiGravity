@@ -1,15 +1,27 @@
-import React from 'react';
-import { Clock, CheckCircle2, Box, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, CheckCircle2, Box, ChevronRight, ChevronDown } from 'lucide-react';
 
 export const UserProfileOverlay = ({
     upcomingBookings,
     pastSessions,
     email,
     initialPods,
-    initialLocations
+    initialLocations,
+    handleOpenPod,
+    handleCancelBooking
 }) => {
-    const myUpcoming = upcomingBookings.filter(b => b.email === email);
-    const myPast = pastSessions.filter(s => s.email === email);
+    const [expandedBookingId, setExpandedBookingId] = useState(null);
+
+    const myUpcoming = email ? upcomingBookings.filter(b => b.email === email) : upcomingBookings;
+    const myPast = email ? pastSessions.filter(s => s.email === email) : pastSessions;
+
+    const toggleExpand = (id) => {
+        if (expandedBookingId === id) {
+            setExpandedBookingId(null);
+        } else {
+            setExpandedBookingId(id);
+        }
+    };
 
     return (
         <div className="flex flex-col h-full bg-slate-50 animate-fade-in overflow-y-auto pb-12">
@@ -35,24 +47,43 @@ export const UserProfileOverlay = ({
                                 const loc = initialLocations.find(l => l.id === pod?.locationId);
                                 const dateObj = new Date(booking.scheduledTime);
                                 return (
-                                    <div key={booking.id} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm relative overflow-hidden group">
+                                    <div 
+                                        key={booking.id} 
+                                        className={`bg-white border p-5 rounded-2xl shadow-sm relative overflow-hidden group transition-all cursor-pointer ${expandedBookingId === booking.id ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200 hover:border-indigo-200'}`}
+                                        onClick={() => toggleExpand(booking.id)}
+                                    >
                                         <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                                        <div className="flex justify-between items-start mb-3">
+                                        <div className="flex justify-between items-start">
                                             <div>
                                                 <p className="font-bold text-slate-900 text-lg">{dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</p>
                                                 <p className="text-sm font-medium text-slate-500">{dateObj.toLocaleDateString([], { weekday: 'short', month: 'long', day: 'numeric' })}</p>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="font-semibold text-slate-800">{pod?.name}</p>
-                                                <p className="text-xs text-slate-500">{loc?.name}</p>
+                                            <div className="text-right flex items-center gap-2">
+                                                <div>
+                                                    <p className="font-semibold text-slate-800">{pod?.name}</p>
+                                                    <p className="text-xs text-slate-500">{loc?.name}</p>
+                                                </div>
+                                                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${expandedBookingId === booking.id ? 'rotate-180' : ''}`} />
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => console.log('Cancel ' + booking.id)}
-                                            className="w-full mt-2 py-2.5 bg-red-50 text-red-600 font-bold text-sm rounded-xl hover:bg-red-100 transition-colors border border-red-100"
-                                        >
-                                            Cancel Reservation
-                                        </button>
+                                        
+                                        {/* Expanded Actions */}
+                                        {expandedBookingId === booking.id && (
+                                            <div className="mt-4 pt-4 border-t border-slate-100 flex gap-3 animate-fade-in" onClick={e => e.stopPropagation()}>
+                                                <button
+                                                    onClick={() => handleCancelBooking(booking.id)}
+                                                    className="w-1/3 py-3 bg-white text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors border border-slate-200"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={() => handleOpenPod(booking)}
+                                                    className="w-2/3 py-3 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-600/20 active:scale-[0.98]"
+                                                >
+                                                    Open Pod
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             })}

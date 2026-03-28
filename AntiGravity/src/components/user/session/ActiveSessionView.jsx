@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, CheckCircle } from 'lucide-react';
+import { Lock, Unlock, CheckCircle } from 'lucide-react';
 
 export const ActiveSessionView = ({
     isPodOpen,
@@ -47,12 +47,29 @@ export const ActiveSessionView = ({
             <div className="text-7xl font-bold tabular-nums tracking-tighter text-slate-800 mb-3 drop-shadow-sm font-mono">
                 {formatTime(timeLeft)}
             </div>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Remaining</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">Remaining</p>
+
+            <div className="flex gap-4 w-full max-w-[280px] mb-8">
+                <button
+                    onClick={() => alert("Pod Door Opened!")}
+                    className="flex-1 py-3.5 rounded-2xl bg-white border-2 border-slate-100 text-slate-700 font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] transition-all flex flex-col items-center gap-1.5 shadow-sm"
+                >
+                    <Unlock className="w-5 h-5 text-slate-400" />
+                    <span className="text-sm">Open Door</span>
+                </button>
+                <button
+                    onClick={() => alert("Pod Door Closed!")}
+                    className="flex-1 py-3.5 rounded-2xl bg-slate-800 border-2 border-slate-800 text-white font-bold hover:bg-slate-900 active:scale-[0.98] transition-all flex flex-col items-center gap-1.5 shadow-sm"
+                >
+                    <Lock className="w-5 h-5 text-slate-300" />
+                    <span className="text-sm">Close Door</span>
+                </button>
+            </div>
 
             <div className="p-6 pb-8 absolute bottom-0 w-full left-0 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent">
                 <button
                     onClick={endSession}
-                    className="w-full py-4 rounded-full bg-white border border-slate-200 text-slate-700 font-semibold text-lg hover:bg-slate-50 active:scale-[0.98] transition-all shadow-sm"
+                    className="w-full py-4 rounded-full bg-white border border-red-100 text-red-600 font-semibold text-lg hover:bg-red-50 active:scale-[0.98] transition-all shadow-sm"
                 >
                     End Session
                 </button>

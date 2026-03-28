@@ -9,9 +9,10 @@ export const ConfirmationView = ({
     activeLocation,
     endSessionUIOnly
 }) => {
-    const dateObj = scheduledDate ? new Date(`${scheduledDate}T${scheduledTime || '00:00'}`) : new Date();
+    // Use a fixed time strictly for date parsing locally, so it doesn't try to parse "pm"
+    const dateObj = scheduledDate ? new Date(scheduledDate + 'T12:00:00') : new Date();
     const formattedDate = dateObj.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-    const formattedTime = scheduledTime ? dateObj.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '';
+    const formattedTime = scheduledTime || dateObj.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
     return (
         <div className="flex flex-col items-center justify-center h-full px-6 animate-fade-in text-center relative bg-slate-50">

@@ -38,7 +38,7 @@ export default function App() {
 
     // Session Data
     // Session Data
-    const { activeSessions, addSession, terminateSession, upcomingBookings, addBooking, pastSessions = [] } = useGlobalSession();
+    const { activeSessions, addSession, terminateSession, upcomingBookings, addBooking, cancelBooking, pastSessions = [] } = useGlobalSession();
     const [currentSessionId, setCurrentSessionId] = useState(null);
     const [selectedNap, setSelectedNap] = useState(null);
     const [email, setEmail] = useState('');
@@ -62,8 +62,10 @@ export default function App() {
             const pod = initialPods.find(p => p.id === scanPodId);
             if (pod) {
                 const client = initialClients.find(c => c.id === pod.clientId);
+                const loc = initialLocations.find(l => l.id === pod.locationId);
                 setActivePod(pod);
                 setActiveClient(client);
+                setActiveLocation(loc);
 
                 // Determine next step based on overrides or defaults
                 const requiresLogin = pod.overrides.requiresEmailLogin !== null
@@ -260,7 +262,17 @@ export default function App() {
 
     const finalizeBooking = (nap) => {
         if (bookingType === 'scheduled') {
-            const combinedDateTime = `${scheduledDate}T${scheduledTime}:00Z`; // simplified UTC
+            const parseTo24Hour = (timeStr) => {
+                if (!timeStr) return "00:00";
+                const parts = timeStr.split(' ');
+                if (parts.length < 2) return timeStr;
+                let [hours, minutes] = parts[0].split(':');
+                hours = parseInt(hours, 10);
+                if (parts[1].toLowerCase() === 'pm' && hours < 12) hours += 12;
+                if (parts[1].toLowerCase() === 'am' && hours === 12) hours = 0;
+                return `${hours.toString().padStart(2, '0')}:${minutes}`;
+            };
+            const combinedDateTime = `${scheduledDate}T${parseTo24Hour(scheduledTime)}:00Z`; // simplified UTC
             const newBooking = {
                 podId: activePod?.id,
                 clientId: activeClient?.id,
@@ -299,6 +311,27 @@ export default function App() {
         endSessionUIOnly();
     };
 
+    const handleOpenPod = (booking) => {
+        const pod = initialPods.find(p => p.id === booking.podId);
+        const client = initialClients.find(c => c.id === booking.clientId);
+        const loc = initialLocations.find(l => l.id === pod?.locationId);
+
+        setActivePod(pod);
+        setActiveClient(client);
+        setActiveLocation(loc);
+        setShowProfile(false);
+        
+        // Remove from future scheduled context
+        cancelBooking(booking.id);
+
+        // Convert exactly to an active session right now
+        startSession({ durationMinutes: booking.durationMinutes });
+    };
+
+    const handleCancelBooking = (bookingId) => {
+        cancelBooking(bookingId);
+    };
+
     const formatTime = (seconds) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -333,6 +366,8 @@ export default function App() {
                             email={email}
                             initialPods={initialPods}
                             initialLocations={initialLocations}
+                            handleOpenPod={handleOpenPod}
+                            handleCancelBooking={handleCancelBooking}
                         />
                     ) : (
                         <>
@@ -358,6 +393,7 @@ export default function App() {
                                     currentStep={currentStep}
                                     setCurrentStep={setCurrentStep}
                                     activePod={activePod}
+                                    activeLocation={activeLocation}
                                     activeClient={activeClient}
                                     theme={theme}
                                     bookingType={bookingType}
