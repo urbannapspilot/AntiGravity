@@ -8,6 +8,7 @@ import { CheckoutFlow } from './components/user/checkout/CheckoutFlow';
 import { ActiveSessionView } from './components/user/session/ActiveSessionView';
 import { ConfirmationView } from './components/user/session/ConfirmationView';
 import { UserProfileOverlay } from './components/user/profile/UserProfileOverlay';
+import { API_BASE_URL } from './config';
 
 // --- Shared Helper for Theme Resolution ---
 const resolveThemeProps = (client) => {
