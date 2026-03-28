@@ -36,6 +36,12 @@ jobs:
 
       - name: Build App
         run: npm run build
+        env:
+          VITE_RDS_HOST: ${{ secrets.RDS_HOST }}
+          VITE_RDS_DATABASE: ${{ secrets.RDS_DATABASE }}
+          VITE_ADMIN_PORT: ${{ secrets.ADMIN_PORT }}
+          VITE_IOT_PORT: ${{ secrets.IOT_PORT }}
+          VITE_ENV: 'production'
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
