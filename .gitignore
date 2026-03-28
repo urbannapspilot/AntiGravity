@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+.env
+.DS_Store
+*.log
+aws_output.txt
+AntiGravity/node_modules/
+AntiGravity/dist/
+admin-core/node_modules/
+admin-core/dist/
+iot-core/node_modules/
+iot-core/dist/
+urbannaps-orm/node_modules/
+urbannaps-orm/build/
